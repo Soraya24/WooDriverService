@@ -1,6 +1,7 @@
 package nakthon.soraya.woodriverservice;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
@@ -10,6 +11,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -19,21 +22,24 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-
     private LocationManager locationManager;
     private Criteria criteria;
     private double userLatADouble = 13.66788036,
             userLngADouble = 100.6222558;  //Fix to Bangna
 
-    private LatLng userLatLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        //Synchronize Location
+        synchronizeLocation();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         myMapFragment();
@@ -41,7 +47,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Setup Object
         setupObject();
 
+        //searchController
+        searchController();
+
     }   // Main Method
+
+    private void searchController() {
+        EditText editText = (EditText) findViewById(R.id.edtSearch);
+        editText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(MapsActivity.this, SearchActivity.class));
+            }
+        });
+    }
+
+    private void synchronizeLocation() {
+
+        try {
+
+            String strURL = "http://woodriverservice.com/Android/getLocation.php";
+
+            GetAllData getAllData = new GetAllData(this);
+            getAllData.execute(strURL);
+
+            String strJSON = getAllData.get();
+            Log.d("7JuneV1", "JSON ==> " + strJSON);
+
+            getAllData.progressDialog.dismiss();
+
+
+            JSONArray jsonArray = new JSONArray(strJSON);
+            int intLength = jsonArray.length();
+            Log.d("7JuneV2", "intLength ==> " + intLength);
+
+
+
+
+
+
+        } catch (Exception e) {
+            Log.d("7JuneV1", "e synchronize ==> " + e.toString());
+        }
+
+    }
 
     @Override
     protected void onResume() {
