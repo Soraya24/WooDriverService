@@ -21,7 +21,7 @@
 
         <EditText
             android:layout_marginLeft="@dimen/padding"
-            android:id="@+id/edtSearch"
+            android:id="@+id/edtSearch2"
             android:hint="Serarch :"
             android:layout_gravity="center_vertical"
             android:background="#ffffff"
@@ -33,7 +33,7 @@
     </LinearLayout>
 
     <ListView
-        android:id="@+id/livLocation"
+        android:id="@+id/android:list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></ListView>
 
