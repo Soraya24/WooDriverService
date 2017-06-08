@@ -38,7 +38,6 @@ public class SearchActivity extends ListActivity {
         createSearchView();
 
 
-
     }   // Main Method
 
     private void createSearchView() {
@@ -121,8 +120,6 @@ public class SearchActivity extends ListActivity {
 
 
     }   // createSearchView
-
-
 
 
     public void AppendList(ArrayList<String> str) {
