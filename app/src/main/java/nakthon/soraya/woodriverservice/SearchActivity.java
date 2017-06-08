@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -36,11 +37,24 @@ public class SearchActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        //Back Controller
+        backController();
+
         //Create Search View
         createSearchView();
 
 
     }   // Main Method
+
+    private void backController() {
+        ImageView imageView = (ImageView) findViewById(R.id.imvBack);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+    }
 
     private void createSearchView() {
 
@@ -157,10 +171,11 @@ public class SearchActivity extends ListActivity {
             }   // for
 
             //Back Finish
-            Intent intent = new Intent(SearchActivity.this, MapsActivity.class);
+            Intent intent = new Intent(SearchActivity.this, DirectionActivity.class);
             intent.putExtra("Result", locationStrings);
-            setResult(1000, intent);
-            finish();
+            intent.putExtra("Lat", getIntent().getDoubleExtra("Lat", 0));
+            intent.putExtra("Lng", getIntent().getDoubleExtra("Lng", 0));
+            startActivity(intent);
 
         } catch (Exception e) {
             Log.d(tag, "e findDetail ==> " + e.toString());
