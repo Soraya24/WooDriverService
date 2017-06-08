@@ -31,6 +31,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Criteria criteria;
     private double userLatADouble = 13.66788036,
             userLngADouble = 100.6222558;  //Fix to Bangna
+    private double destinateLatADouble, destinateLngADouble;
+    private String[] resultStrings;
+    private LatLng userLatLng;
 
 
     @Override
@@ -52,12 +55,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }   // Main Method
 
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d("8JuneV3", "onActivity Work");
+        Log.d("8JuneV3", "requestCode ==> " + requestCode);
+
+        resultStrings = data.getStringArrayExtra("Result");
+        for (int i=0;i<resultStrings.length;i+=1) {
+            Log.d("8JuneV3", "resultString(" + i + ") ==> " + resultStrings[i]);
+
+            //Change Center Map & Create Marker
+//            destinateLatADouble =
+//            createCenterMap();
+
+        }
+
+
+    }   // onActivityResult
+
     private void searchController() {
         EditText editText = (EditText) findViewById(R.id.edtSearch);
         editText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MapsActivity.this, SearchActivity.class));
+                Intent intent = new Intent(MapsActivity.this, SearchActivity.class);
+                startActivityForResult(intent, 1000);
             }
         });
     }
@@ -190,16 +215,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        userLatLng = new LatLng(userLatADouble, userLngADouble);
 
         //Create Center Map
-        LatLng userLatLng = new LatLng(userLatADouble, userLngADouble);
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 16));
+        createCenterMap(userLatLng);
 
         //Create Marker
         createMarker(userLatLng, R.mipmap.ic_launcher);
 
 
     }   // onMapReady
+
+    private void createCenterMap(LatLng latLng) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+    }
 
     private void createMarker(LatLng latLng, int intIcon) {
         MarkerOptions markerOptions = new MarkerOptions()

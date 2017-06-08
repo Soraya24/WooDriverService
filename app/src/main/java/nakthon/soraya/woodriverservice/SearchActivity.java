@@ -2,6 +2,7 @@ package nakthon.soraya.woodriverservice;
 
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -114,12 +116,60 @@ public class SearchActivity extends ListActivity {
                 }
             });
 
+            //Click ListView For Active
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Log.d("8JuneV2", "You click ==> " + array_sort.get(i));
+                    findDetailPhone(array_sort.get(i));
+                }
+            });
+
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
 
     }   // createSearchView
+
+    private void findDetailPhone(String strLocation) {
+
+        String tag = "8JuneV2";
+        String[] columnLocationStrings = new String[]{"id", "Name", "Lat", "Lng"};
+        String urlGetLocationWhereName = "http://woodriverservice.com/Android/getLocationWhereName.php";
+
+        try {
+
+
+
+            GetDataWhere getDataWhere = new GetDataWhere(SearchActivity.this);
+            getDataWhere.execute(columnLocationStrings[1], strLocation,
+                    urlGetLocationWhereName);
+            String strJSON = getDataWhere.get();
+            Log.d(tag, "JSON where ==> " + strJSON);
+
+            String[] locationStrings = new String[columnLocationStrings.length];
+            JSONArray jsonArray = new JSONArray(strJSON);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+            for (int i = 0; i < columnLocationStrings.length; i++) {
+                locationStrings[i] = jsonObject.getString(columnLocationStrings[i]);
+                Log.d(tag, "locationString(" + i + ") ==> " + locationStrings[i]);
+            }   // for
+
+            //Back Finish
+            Intent intent = new Intent(SearchActivity.this, MapsActivity.class);
+            intent.putExtra("Result", locationStrings);
+            setResult(1000, intent);
+            finish();
+
+        } catch (Exception e) {
+            Log.d(tag, "e findDetail ==> " + e.toString());
+        }
+
+    }   // findDetail
 
 
     public void AppendList(ArrayList<String> str) {
