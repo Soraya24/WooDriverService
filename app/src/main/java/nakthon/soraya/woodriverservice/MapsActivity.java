@@ -68,8 +68,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d("8JuneV3", "resultString(" + i + ") ==> " + resultStrings[i]);
 
             //Change Center Map & Create Marker
-//            destinateLatADouble =
-//            createCenterMap();
+            destinateLatADouble = Double.parseDouble(resultStrings[2]);
+            destinateLngADouble = Double.parseDouble(resultStrings[3]);
+            LatLng latLng = new LatLng(destinateLatADouble, destinateLngADouble);
+            createCenterMap(latLng);
+            createMarker(latLng, R.mipmap.ic_destination);
 
         }
 
