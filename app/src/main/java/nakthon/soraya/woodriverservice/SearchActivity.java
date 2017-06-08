@@ -126,8 +126,6 @@ public class SearchActivity extends ListActivity {
             });
 
 
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -142,7 +140,6 @@ public class SearchActivity extends ListActivity {
         String urlGetLocationWhereName = "http://woodriverservice.com/Android/getLocationWhereName.php";
 
         try {
-
 
 
             GetDataWhere getDataWhere = new GetDataWhere(SearchActivity.this);
