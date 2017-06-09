@@ -1,8 +1,14 @@
 package nakthon.soraya.woodriverservice;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 
+import com.akexorcist.googledirection.DirectionCallback;
+import com.akexorcist.googledirection.GoogleDirection;
+import com.akexorcist.googledirection.constant.TransportMode;
+import com.akexorcist.googledirection.model.Direction;
+import com.akexorcist.googledirection.util.DirectionConverter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -11,13 +17,16 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class DirectionActivity extends FragmentActivity implements OnMapReadyCallback {
+import java.util.ArrayList;
+
+public class DirectionActivity extends FragmentActivity implements OnMapReadyCallback, DirectionCallback {
 
     private GoogleMap mMap;
     private String[] destinationStrings;
     private double startLatADouble, startLngADouble;
     private LatLng startLatLng, destinationLatLng;
     private int[] iconInts = new int[]{R.mipmap.ic_launcher, R.mipmap.ic_destination};
+    private String serverKeyString = "AIzaSyAloVYlvZeXa7A86bqofs_0ytQ4Pz-CBaQ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +70,20 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         //Create Marker Destination
         createMarker(destinationLatLng, iconInts[1]);
 
+        //Create Direction
+        createDirection(startLatLng, destinationLatLng);
+
     }   // onMapReady
+
+    private void createDirection(LatLng startLatLng, LatLng destinationLatLng) {
+
+        GoogleDirection.withServerKey(serverKeyString)
+                .from(startLatLng)
+                .to(destinationLatLng)
+                .transportMode(TransportMode.DRIVING)
+                .execute(DirectionActivity.this);
+
+    }
 
     private void createMarker(LatLng latLng, int intIcon) {
         MarkerOptions markerOptions = new MarkerOptions().position(latLng)
@@ -73,4 +95,22 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationLatLng, 16));
     }
 
+    @Override
+    public void onDirectionSuccess(Direction direction, String rawBody) {
+
+        if (direction.isOK()) {
+
+            ArrayList<LatLng> latLngArrayList = direction.getRouteList()
+                    .get(0).getLegList().get(0).getDirectionPoint();
+            mMap.addPolyline(DirectionConverter.createPolyline(DirectionActivity.this,
+                    latLngArrayList, 5, Color.RED));
+
+        }
+
+    }
+
+    @Override
+    public void onDirectionFailure(Throwable t) {
+
+    }
 }   // Main Class
