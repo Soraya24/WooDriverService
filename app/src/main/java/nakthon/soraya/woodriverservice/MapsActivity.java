@@ -226,7 +226,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         createCenterMap(userLatLng);
 
         //Create Marker
-        createMarker(userLatLng, R.mipmap.ic_launcher);
+        createMarker(userLatLng, R.mipmap.ic_start);
 
 
     }   // onMapReady

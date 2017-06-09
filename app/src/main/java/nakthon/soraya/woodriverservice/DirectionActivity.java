@@ -3,11 +3,16 @@ package nakthon.soraya.woodriverservice;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.akexorcist.googledirection.DirectionCallback;
 import com.akexorcist.googledirection.GoogleDirection;
 import com.akexorcist.googledirection.constant.TransportMode;
 import com.akexorcist.googledirection.model.Direction;
+import com.akexorcist.googledirection.model.Info;
 import com.akexorcist.googledirection.util.DirectionConverter;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,7 +30,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     private String[] destinationStrings;
     private double startLatADouble, startLngADouble;
     private LatLng startLatLng, destinationLatLng;
-    private int[] iconInts = new int[]{R.mipmap.ic_launcher, R.mipmap.ic_destination};
+    private int[] iconInts = new int[]{R.mipmap.ic_start, R.mipmap.ic_destination};
     private String serverKeyString = "AIzaSyAloVYlvZeXa7A86bqofs_0ytQ4Pz-CBaQ";
 
     @Override
@@ -36,11 +41,23 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         //Receive Value & Setup
         receiveAndSetup();
 
-
         //Map Fragment
         mapFragment();
 
+        //Back Controller
+        backController();
+
     }   // Main Method
+
+    private void backController() {
+        ImageView imageView = (ImageView) findViewById(R.id.imvBack);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+    }
 
     private void receiveAndSetup() {
         destinationStrings = getIntent().getStringArrayExtra("Result");
@@ -92,7 +109,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void createCenterMap(LatLng latLng) {
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationLatLng, 16));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationLatLng, 12));
     }
 
     @Override
@@ -105,8 +122,44 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             mMap.addPolyline(DirectionConverter.createPolyline(DirectionActivity.this,
                     latLngArrayList, 5, Color.RED));
 
+            Info distanceInfo = direction.getRouteList().get(0).getLegList().get(0).getDistance();
+            String strdistance = distanceInfo.getText();
+            Log.d("9JuneV1", "distance ==> " + strdistance);
+
+            //Calculate Price And Show
+            calculatePriceAndShow(strdistance);
+
         }
 
+    }
+
+    private void calculatePriceAndShow(String strdistance) {
+
+        //Show Distance
+        TextView distanceTextView = (TextView) findViewById(R.id.txtDistance);
+        distanceTextView.setText(strdistance);
+
+        //Show Price
+        String strPrice = myCalPrice(strdistance);
+        TextView priceTextView = (TextView) findViewById(R.id.txtPrice);
+        priceTextView.setText(strPrice);
+
+
+    }
+
+    private String myCalPrice(String strdistance) {
+
+        String strPrice = null;
+        double douDistance = 0;
+        double douPrice = 0;
+        Log.d("9JuneV1", "Receive strdistance ==> " + strdistance);
+        String[] strings = strdistance.split(" ");
+
+        douDistance = Double.parseDouble(strings[0]);
+        douPrice = douDistance * 5;
+        strPrice = Double.toString(douPrice) + " THB";
+
+        return strPrice;
     }
 
     @Override
