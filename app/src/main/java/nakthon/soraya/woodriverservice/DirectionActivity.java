@@ -1,12 +1,16 @@
 package nakthon.soraya.woodriverservice;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.akexorcist.googledirection.DirectionCallback;
 import com.akexorcist.googledirection.GoogleDirection;
@@ -23,6 +27,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class DirectionActivity extends FragmentActivity implements OnMapReadyCallback, DirectionCallback {
 
@@ -32,8 +37,13 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     private LatLng startLatLng, destinationLatLng;
     private int[] iconInts = new int[]{R.mipmap.ic_start, R.mipmap.ic_destination};
     private String serverKeyString = "AIzaSyAloVYlvZeXa7A86bqofs_0ytQ4Pz-CBaQ";
+    private int dayAnInt, monthAnInt, yearAnInt, hourAnInt, minusAnInt;
+    private boolean aBoolean = true;
+    private String dateString, timeString;
+
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_direction);
@@ -47,7 +57,86 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         //Back Controller
         backController();
 
+        //Date Controller
+        dateController();
+
+        //Find Current Date & Time
+        findCurrentDatTime();
+
     }   // Main Method
+
+    private void dateController() {
+
+        ImageView imageView = (ImageView) findViewById(R.id.imvDate);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                setupDateAndTime();
+                //setupTime(hourAnInt, minusAnInt);
+
+            }
+        });
+
+    }
+
+    private void setupDateAndTime() {
+
+        aBoolean = true;
+        //Show Date Picker
+        final DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                yearAnInt = i;
+                monthAnInt = i1;
+                dayAnInt = i2;
+                if (aBoolean) {
+                    setupTime(hourAnInt, minusAnInt);
+                }
+            }
+        }, yearAnInt, monthAnInt, dayAnInt);
+        datePickerDialog.setCancelable(false);
+
+        datePickerDialog.show();
+    }
+
+    private void findCurrentDatTime() {
+        Calendar calendar = Calendar.getInstance();
+        dayAnInt = calendar.get(Calendar.DAY_OF_MONTH);
+        monthAnInt = calendar.get(Calendar.MONTH);
+        yearAnInt = calendar.get(Calendar.YEAR);
+        hourAnInt = calendar.get(Calendar.HOUR_OF_DAY);
+        minusAnInt = calendar.get(Calendar.MINUTE);
+
+        showDateTime();
+
+    }
+
+    private void showDateTime() {
+        TextView textView = (TextView) findViewById(R.id.txtDate);
+        dateString = Integer.toString(dayAnInt) + "/" + Integer.toString(monthAnInt + 1) + "/" + yearAnInt;
+        timeString = Integer.toString(hourAnInt) + ":" + Integer.toString(minusAnInt) + ":00";
+
+        textView.setText(dateString + " " + timeString);
+
+    }
+
+    private void setupTime(final int myHourAnInt, int myMinusAnInt) {
+        Log.d("9JuneV2", "setupTime Work");
+        aBoolean = false;
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(DirectionActivity.this,
+                new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                hourAnInt = i;
+                minusAnInt = i1;
+                showDateTime();
+            }
+        }, myHourAnInt, myMinusAnInt, true);
+        timePickerDialog.show();
+
+    }
 
     private void backController() {
         ImageView imageView = (ImageView) findViewById(R.id.imvBack);
