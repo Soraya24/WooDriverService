@@ -127,13 +127,13 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(DirectionActivity.this,
                 new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int i, int i1) {
-                hourAnInt = i;
-                minusAnInt = i1;
-                showDateTime();
-            }
-        }, myHourAnInt, myMinusAnInt, true);
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                        hourAnInt = i;
+                        minusAnInt = i1;
+                        showDateTime();
+                    }
+                }, myHourAnInt, myMinusAnInt, true);
         timePickerDialog.show();
 
     }
