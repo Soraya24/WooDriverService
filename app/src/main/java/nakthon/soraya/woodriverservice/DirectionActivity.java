@@ -179,7 +179,34 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         //Create Direction
         createDirection(startLatLng, destinationLatLng);
 
+        //Click On Map
+        clickOnMap();
+
     }   // onMapReady
+
+    private void clickOnMap() {
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+
+                Log.d("9JuneV3", "You Click Map");
+                destinationLatLng = latLng;
+
+                //Clear Map
+                mMap.clear();
+
+                //Marker of Start
+                createMarker(startLatLng, iconInts[0]);
+
+                //Create Marker of Destination
+                createMarker(destinationLatLng, iconInts[1]);
+
+                createDirection(startLatLng, destinationLatLng);
+
+
+            }
+        });
+    }
 
     private void createDirection(LatLng startLatLng, LatLng destinationLatLng) {
 
