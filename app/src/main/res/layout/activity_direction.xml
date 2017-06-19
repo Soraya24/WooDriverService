@@ -7,10 +7,10 @@
     tools:context="nakthon.soraya.woodriverservice.MainActivity">
 
     <LinearLayout
-        android:layout_above="@+id/btnSave"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linBottom"
+        android:orientation="vertical">
 
         <!--Map and Back Image-->
         <RelativeLayout
@@ -46,11 +46,11 @@
             android:padding="@dimen/padding">
 
             <TextView
-                android:layout_marginBottom="@dimen/padding"
-                android:textColor="@color/colorPrimaryDark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/padding"
                 android:text="Destination :"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="@dimen/h2"
                 android:textStyle="bold" />
 
@@ -125,17 +125,34 @@
             </LinearLayout>
 
 
-
         </LinearLayout>
 
     </LinearLayout>
 
-    <Button
-        android:text="Save Data To Server"
-        android:id="@+id/btnSave"
-        android:layout_alignParentBottom="true"
+    <LinearLayout
+        android:id="@+id/linBottom"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorPrimary"
+        android:orientation="horizontal"
+        android:padding="@dimen/padding">
+
+        <ImageView
+            android:id="@+id/imvAddPoint"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_add" />
+
+        <ImageView
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/ic_save" />
+
+
+    </LinearLayout>
 
 
 </RelativeLayout>

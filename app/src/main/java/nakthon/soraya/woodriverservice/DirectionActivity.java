@@ -63,7 +63,24 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         //Find Current Date & Time
         findCurrentDatTime();
 
+        //Add Point Controller
+        addPointController();
+
+
     }   // Main Method
+
+    private void addPointController() {
+        ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
+        final String tag = "19JuneV1";
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d(tag, "Click Add Point");
+
+            }   // onClick
+        });
+    }   //
 
     private void dateController() {
 
