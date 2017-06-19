@@ -1,7 +1,9 @@
 package nakthon.soraya.woodriverservice;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -25,6 +27,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,7 +42,10 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     private String serverKeyString = "AIzaSyAloVYlvZeXa7A86bqofs_0ytQ4Pz-CBaQ";
     private int dayAnInt, monthAnInt, yearAnInt, hourAnInt, minusAnInt;
     private boolean aBoolean = true;
+    private boolean aBoolean2 = true;
+    private boolean aBoolean3 = false;
     private String dateString, timeString;
+    private PolylineOptions polylineOptions;
 
 
     @Override
@@ -66,8 +72,21 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         //Add Point Controller
         addPointController();
 
+        //Confirm Controller
+        confirmController();
+
 
     }   // Main Method
+
+    private void confirmController() {
+        ImageView imageView = (ImageView) findViewById(R.id.imvConfirm);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myAlertConfirm("Add Point");
+            }
+        });
+    }
 
     private void addPointController() {
         ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
@@ -76,7 +95,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             @Override
             public void onClick(View view) {
 
-                Log.d(tag, "Click Add Point");
+                aBoolean2 = false;
+                Log.d(tag, "Click Add Point aBoolean2 ==> " + aBoolean2);
+
 
             }   // onClick
         });
@@ -180,6 +201,43 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
     }
 
+    private void myAlertConfirm(String strMessage) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(DirectionActivity.this);
+        builder.setCancelable(false);
+        builder.setTitle("Please Confirm");
+        builder.setMessage(strMessage);
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                aBoolean3 = true;
+                aBoolean2 = true;
+                destinationLatLng = startLatLng;
+
+                //Clear Map
+                mMap.clear();
+
+                //Marker of Start
+                createMarker(startLatLng, iconInts[0]);
+
+                //Create Marker of Destination
+                createMarker(destinationLatLng, iconInts[1]);
+
+                createDirection(startLatLng, destinationLatLng);
+
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
+
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -202,28 +260,40 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     }   // onMapReady
 
     private void clickOnMap() {
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
 
-                Log.d("9JuneV3", "You Click Map");
-                destinationLatLng = latLng;
+                if (aBoolean2) {
+                    Log.d("9JuneV3", "You Click Map");
+                    destinationLatLng = latLng;
 
-                //Clear Map
-                mMap.clear();
+                    //Clear Map
+                    mMap.clear();
 
-                //Marker of Start
-                createMarker(startLatLng, iconInts[0]);
+                    //Marker of Start
+                    createMarker(startLatLng, iconInts[0]);
 
-                //Create Marker of Destination
-                createMarker(destinationLatLng, iconInts[1]);
+                    //Create Marker of Destination
+                    createMarker(destinationLatLng, iconInts[1]);
 
-                createDirection(startLatLng, destinationLatLng);
+                    createDirection(startLatLng, destinationLatLng);
+                } else {
+                    startLatLng = destinationLatLng; // Assign Destination ==> Start
+                    destinationLatLng = latLng;      // Assign latLnt ==> Destination
+                    createMarker(destinationLatLng, iconInts[1]);
+                    createDirection(startLatLng, destinationLatLng);
+
+                   // myAlertConfirm("Add Point2");
+
+                }
 
 
-            }
+            }   // onMapClick
         });
-    }
+
+    }   // clickOnMap
 
     private void createDirection(LatLng startLatLng, LatLng destinationLatLng) {
 
@@ -252,8 +322,17 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
             ArrayList<LatLng> latLngArrayList = direction.getRouteList()
                     .get(0).getLegList().get(0).getDirectionPoint();
-            mMap.addPolyline(DirectionConverter.createPolyline(DirectionActivity.this,
-                    latLngArrayList, 5, Color.RED));
+
+            polylineOptions = DirectionConverter.createPolyline(DirectionActivity.this,
+                    latLngArrayList, 5, Color.RED);
+
+
+            mMap.addPolyline(polylineOptions);
+
+
+
+//            mMap.addPolyline(DirectionConverter.createPolyline(DirectionActivity.this,
+//                    latLngArrayList, 5, Color.RED));
 
             Info distanceInfo = direction.getRouteList().get(0).getLegList().get(0).getDistance();
             String strdistance = distanceInfo.getText();
