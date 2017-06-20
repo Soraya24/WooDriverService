@@ -84,13 +84,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         editText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MapsActivity.this, SearchActivity.class);
+                Intent intent = new Intent(MapsActivity.this,
+                        SearchActivity.class);
                 intent.putExtra("Lat", userLatADouble);
                 intent.putExtra("Lng", userLngADouble);
                 startActivity(intent);
             }
         });
-    }
+    }   // searchController
 
     private void synchronizeLocation() {
 
