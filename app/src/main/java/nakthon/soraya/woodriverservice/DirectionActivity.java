@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -78,6 +79,24 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }   // Main Method
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String tag = "20JuneV2";
+        Log.d(tag, "aBoolean2 ==> " + aBoolean2);
+
+        if (!aBoolean2) {
+
+            Log.d(tag, "สิ่งที่ทำหลังจาก AddPoint");
+
+        }
+
+
+
+
+    }
+
     private void confirmController() {
         ImageView imageView = (ImageView) findViewById(R.id.imvConfirm);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -89,14 +108,18 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void addPointController() {
-        ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
+        final ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
         final String tag = "19JuneV1";
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                // aBoolean2 false ==> สามารถเพิ่ม Point ได้
                 aBoolean2 = false;
                 Log.d(tag, "Click Add Point aBoolean2 ==> " + aBoolean2);
+
+                //Change Image When Click
+                imageView.setImageResource(R.mipmap.ic_unadd);
 
 
             }   // onClick
@@ -177,13 +200,59 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void backController() {
+
+        //Initial View
         ImageView imageView = (ImageView) findViewById(R.id.imvBack);
+
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
-            }
+
+                Log.d("20JuneV1", "Click Back Status ==> " + aBoolean2);
+
+                Intent intent = new Intent(DirectionActivity.this, SearchActivity.class);
+                intent.putExtra("Status", aBoolean2);
+                setResult(1000, intent);
+
+                if (aBoolean2) {
+                    finish();
+                } else {
+
+                    backForAddPoint();
+
+
+                    //startActivity(intent);
+                }
+
+            }   // onClick
         });
+    }   // backController
+
+    private void backForAddPoint() {
+
+        Intent intent = new Intent(DirectionActivity.this, SearchActivity.class);
+        intent.putExtra("Status", aBoolean2);
+        startActivityForResult(intent, 1200);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String tag = "20JuneV2";
+
+        if (requestCode == 1200) {
+
+            Log.d(tag, "สิ่งที่ทำงาน หลัง SearchView ที่ AddPoinet");
+            String[] locationStrings = data.getStringArrayExtra("Result");
+            LatLng latLng = new LatLng(Double.parseDouble(locationStrings[2]),
+                    Double.parseDouble(locationStrings[3]));
+            addMarkerPoint(latLng);
+
+
+        }
+
+
     }
 
     private void receiveAndSetup() {
@@ -280,10 +349,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
                     createDirection(startLatLng, destinationLatLng);
                 } else {
-                    startLatLng = destinationLatLng; // Assign Destination ==> Start
-                    destinationLatLng = latLng;      // Assign latLnt ==> Destination
-                    createMarker(destinationLatLng, iconInts[1]);
-                    createDirection(startLatLng, destinationLatLng);
+                    addMarkerPoint(latLng);
 
                    // myAlertConfirm("Add Point2");
 
@@ -294,6 +360,13 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         });
 
     }   // clickOnMap
+
+    private void addMarkerPoint(LatLng latLngDestination) {
+        startLatLng = destinationLatLng; // Assign Destination ==> Start
+        destinationLatLng = latLngDestination;      // Assign latLnt ==> Destination
+        createMarker(destinationLatLng, iconInts[1]);
+        createDirection(startLatLng, destinationLatLng);
+    }
 
     private void createDirection(LatLng startLatLng, LatLng destinationLatLng) {
 
