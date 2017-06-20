@@ -58,6 +58,7 @@ public class SearchActivity extends ListActivity {
 
     private void createSearchView() {
 
+//        Synchronize Data Location From JSON
         try {
 
             String urlJSON = "http://woodriverservice.com/Android/getLocation.php";
@@ -170,12 +171,17 @@ public class SearchActivity extends ListActivity {
                 Log.d(tag, "locationString(" + i + ") ==> " + locationStrings[i]);
             }   // for
 
-            //Back Finish
+            //Click ListView Finish
             Intent intent = new Intent(SearchActivity.this, DirectionActivity.class);
+
+            //Result ที่ได้จากการคลิก ListView
             intent.putExtra("Result", locationStrings);
+
+            //Lat, Lng ที่รับมาจาก MapsActivity กำลังส่งต่อไปที่ Direct
             intent.putExtra("Lat", getIntent().getDoubleExtra("Lat", 0));
             intent.putExtra("Lng", getIntent().getDoubleExtra("Lng", 0));
-            startActivity(intent);
+
+            startActivityForResult(intent, 1000);
 
         } catch (Exception e) {
             Log.d(tag, "e findDetail ==> " + e.toString());
@@ -183,6 +189,22 @@ public class SearchActivity extends ListActivity {
 
     }   // findDetail
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String tag = "20JuneV1";
+
+        Log.d(tag, "onActivityResult Working");
+        Log.d(tag, "requestCode ==> " + requestCode);
+        Log.d(tag, "resultCode ==> " + resultCode);
+
+        if (requestCode == 1000 && resultCode == 1000) {
+
+            Log.d(tag, "onActivityResult ==> OK");
+
+        }   // if
+
+    }   // onActivityResult
 
     public void AppendList(ArrayList<String> str) {
         setListAdapter(new bsAdapter(this));

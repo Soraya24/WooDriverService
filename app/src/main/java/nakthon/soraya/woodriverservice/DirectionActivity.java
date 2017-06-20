@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -89,14 +90,18 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void addPointController() {
-        ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
+        final ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
         final String tag = "19JuneV1";
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                // aBoolean2 false ==> สามารถเพิ่ม Point ได้
                 aBoolean2 = false;
                 Log.d(tag, "Click Add Point aBoolean2 ==> " + aBoolean2);
+
+                //Change Image When Click
+                imageView.setImageResource(R.mipmap.ic_unadd);
 
 
             }   // onClick
@@ -177,14 +182,24 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void backController() {
+
+        //Initial View
         ImageView imageView = (ImageView) findViewById(R.id.imvBack);
+
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                Log.d("20JuneV1", "Click Back Status ==> " + aBoolean2);
+
+                Intent intent = new Intent(DirectionActivity.this, SearchActivity.class);
+                intent.putExtra("Status", aBoolean2);
+                setResult(1000, intent);
                 finish();
-            }
+
+            }   // onClick
         });
-    }
+    }   // backController
 
     private void receiveAndSetup() {
         destinationStrings = getIntent().getStringArrayExtra("Result");
