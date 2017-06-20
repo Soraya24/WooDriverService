@@ -79,6 +79,24 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }   // Main Method
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        String tag = "20JuneV2";
+        Log.d(tag, "aBoolean2 ==> " + aBoolean2);
+
+        if (!aBoolean2) {
+
+            Log.d(tag, "สิ่งที่ทำหลังจาก AddPoint");
+
+        }
+
+
+
+
+    }
+
     private void confirmController() {
         ImageView imageView = (ImageView) findViewById(R.id.imvConfirm);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -199,12 +217,43 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                 if (aBoolean2) {
                     finish();
                 } else {
-                    startActivity(intent);
+
+                    backForAddPoint();
+
+
+                    //startActivity(intent);
                 }
 
             }   // onClick
         });
     }   // backController
+
+    private void backForAddPoint() {
+
+        Intent intent = new Intent(DirectionActivity.this, SearchActivity.class);
+        intent.putExtra("Status", aBoolean2);
+        startActivityForResult(intent, 1200);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        String tag = "20JuneV2";
+
+        if (requestCode == 1200) {
+
+            Log.d(tag, "สิ่งที่ทำงาน หลัง SearchView ที่ AddPoinet");
+            String[] locationStrings = data.getStringArrayExtra("Result");
+            LatLng latLng = new LatLng(Double.parseDouble(locationStrings[2]),
+                    Double.parseDouble(locationStrings[3]));
+            addMarkerPoint(latLng);
+
+
+        }
+
+
+    }
 
     private void receiveAndSetup() {
         destinationStrings = getIntent().getStringArrayExtra("Result");
@@ -300,10 +349,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
                     createDirection(startLatLng, destinationLatLng);
                 } else {
-                    startLatLng = destinationLatLng; // Assign Destination ==> Start
-                    destinationLatLng = latLng;      // Assign latLnt ==> Destination
-                    createMarker(destinationLatLng, iconInts[1]);
-                    createDirection(startLatLng, destinationLatLng);
+                    addMarkerPoint(latLng);
 
                    // myAlertConfirm("Add Point2");
 
@@ -314,6 +360,13 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         });
 
     }   // clickOnMap
+
+    private void addMarkerPoint(LatLng latLngDestination) {
+        startLatLng = destinationLatLng; // Assign Destination ==> Start
+        destinationLatLng = latLngDestination;      // Assign latLnt ==> Destination
+        createMarker(destinationLatLng, iconInts[1]);
+        createDirection(startLatLng, destinationLatLng);
+    }
 
     private void createDirection(LatLng startLatLng, LatLng destinationLatLng) {
 

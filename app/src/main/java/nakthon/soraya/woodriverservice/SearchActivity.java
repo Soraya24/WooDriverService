@@ -182,7 +182,12 @@ public class SearchActivity extends ListActivity {
             intent.putExtra("Lat", getIntent().getDoubleExtra("Lat", 0));
             intent.putExtra("Lng", getIntent().getDoubleExtra("Lng", 0));
 
-            startActivityForResult(intent, 1000);
+            if (aBoolean) {
+                startActivityForResult(intent, 1000);
+            } else {
+                setResult(1200, intent);
+                finish();
+            }
 
         } catch (Exception e) {
             Log.d(tag, "e findDetail ==> " + e.toString());
