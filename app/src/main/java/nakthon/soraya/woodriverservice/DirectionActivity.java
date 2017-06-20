@@ -195,7 +195,12 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                 Intent intent = new Intent(DirectionActivity.this, SearchActivity.class);
                 intent.putExtra("Status", aBoolean2);
                 setResult(1000, intent);
-                finish();
+
+                if (aBoolean2) {
+                    finish();
+                } else {
+                    startActivity(intent);
+                }
 
             }   // onClick
         });

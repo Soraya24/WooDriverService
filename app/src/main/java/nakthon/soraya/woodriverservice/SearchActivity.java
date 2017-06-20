@@ -30,6 +30,7 @@ public class SearchActivity extends ListActivity {
     private String[] listview_names;
     private ArrayList<String> array_sort;
     private int textlength = 0, Index;
+    private boolean aBoolean = true;
 
 
     @Override
@@ -198,9 +199,13 @@ public class SearchActivity extends ListActivity {
         Log.d(tag, "requestCode ==> " + requestCode);
         Log.d(tag, "resultCode ==> " + resultCode);
 
+        // resultCode ==> 0
+
         if (requestCode == 1000 && resultCode == 1000) {
 
             Log.d(tag, "onActivityResult ==> OK");
+            aBoolean = data.getBooleanExtra("Status", true);
+            Log.d(tag, "aBoolean ที่รับได้ ==> " + aBoolean);
 
         }   // if
 
