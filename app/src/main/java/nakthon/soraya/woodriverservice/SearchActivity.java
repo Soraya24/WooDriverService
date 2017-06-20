@@ -211,6 +211,19 @@ public class SearchActivity extends ListActivity {
 
     }   // onActivityResult
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+
+        aBoolean = getIntent().getBooleanExtra("Status", true);
+
+        String tag = "20JuneV1";
+        Log.d(tag, "aBoolean From onResume ==> " + aBoolean);
+
+
+    }
+
     public void AppendList(ArrayList<String> str) {
         setListAdapter(new bsAdapter(this));
     }
