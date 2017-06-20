@@ -256,12 +256,16 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     }
 
     private void receiveAndSetup() {
+
         destinationStrings = getIntent().getStringArrayExtra("Result");
         startLatADouble = getIntent().getDoubleExtra("Lat", 0);
         startLngADouble = getIntent().getDoubleExtra("Lng", 0);
         startLatLng = new LatLng(startLatADouble, startLngADouble);
         destinationLatLng = new LatLng(Double.parseDouble(destinationStrings[2]),
                 Double.parseDouble(destinationStrings[3]));
+
+        Log.d("20JuneV3", "id of LocationTABLE ==> " + destinationStrings[0]);
+
     }
 
     private void mapFragment() {
@@ -361,12 +365,18 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }   // clickOnMap
 
+    //Increase Marker and Direction
     private void addMarkerPoint(LatLng latLngDestination) {
+
+        //Add Point
         startLatLng = destinationLatLng; // Assign Destination ==> Start
         destinationLatLng = latLngDestination;      // Assign latLnt ==> Destination
         createMarker(destinationLatLng, iconInts[1]);
         createDirection(startLatLng, destinationLatLng);
-    }
+
+
+
+    }   // addMarkerPoint
 
     private void createDirection(LatLng startLatLng, LatLng destinationLatLng) {
 
