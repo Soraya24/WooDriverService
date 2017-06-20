@@ -143,7 +143,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             }
         });
 
-    }
+    }   //dateController
 
     private void setupDateAndTime() {
 
