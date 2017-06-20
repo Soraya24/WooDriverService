@@ -47,6 +47,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     private boolean aBoolean3 = false;
     private String dateString, timeString;
     private PolylineOptions polylineOptions;
+    private ArrayList<String> placeStringArrayList;
 
 
     @Override
@@ -120,6 +121,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
                 //Change Image When Click
                 imageView.setImageResource(R.mipmap.ic_unadd);
+
+                //Add Array List
+                placeStringArrayList.add(destinationStrings[0]);
 
 
             }   // onClick
@@ -266,6 +270,8 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
         Log.d("20JuneV3", "id of LocationTABLE ==> " + destinationStrings[0]);
 
+        placeStringArrayList = new ArrayList<>();
+
     }
 
     private void mapFragment() {
@@ -373,6 +379,10 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         destinationLatLng = latLngDestination;      // Assign latLnt ==> Destination
         createMarker(destinationLatLng, iconInts[1]);
         createDirection(startLatLng, destinationLatLng);
+
+        //Add Point to ArrayList
+        placeStringArrayList.add(destinationStrings[0]);
+        Log.d("20JuneV3", "placeStringArrayList ==> " + placeStringArrayList);
 
 
 
