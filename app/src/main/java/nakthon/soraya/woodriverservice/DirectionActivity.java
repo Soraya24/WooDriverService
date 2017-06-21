@@ -30,6 +30,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -80,6 +83,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }   // Main Method
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -98,6 +102,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 
+    //Check Confirm
     private void confirmController() {
         ImageView imageView = (ImageView) findViewById(R.id.imvConfirm);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -106,8 +111,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                 myAlertConfirm("Add Point");
             }
         });
-    }
+    }   // confirmController
 
+    //Click ImageView for Change Mode to Add Point or Marker
     private void addPointController() {
         final ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
         final String tag = "19JuneV1";
@@ -122,7 +128,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                 //Change Image When Click
                 imageView.setImageResource(R.mipmap.ic_unadd);
 
-                //Add Array List
+                //Add Array List การเพิ่ม array index0
                 placeStringArrayList.add(destinationStrings[0]);
 
 
@@ -203,6 +209,8 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 
+    //Listener of Back #1.ย้งไม่ได้ Add Point จะ Finish
+    // #2. ถ้า Add Point แล้ว ไปทำงานที่ backForAddPoint()
     private void backController() {
 
         //Initial View
@@ -232,8 +240,10 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         });
     }   // backController
 
+    //Method Active After You Click Add Point
     private void backForAddPoint() {
 
+        //Intent for Result to Search Wait Array Result
         Intent intent = new Intent(DirectionActivity.this, SearchActivity.class);
         intent.putExtra("Status", aBoolean2);
         startActivityForResult(intent, 1200);
@@ -248,16 +258,25 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         if (requestCode == 1200) {
 
             Log.d(tag, "สิ่งที่ทำงาน หลัง SearchView ที่ AddPoinet");
-            String[] locationStrings = data.getStringArrayExtra("Result");
-            LatLng latLng = new LatLng(Double.parseDouble(locationStrings[2]),
-                    Double.parseDouble(locationStrings[3]));
+
+            //before
+//            String[] locationStrings = data.getStringArrayExtra("Result");
+//            LatLng latLng = new LatLng(Double.parseDouble(locationStrings[2]),
+//                    Double.parseDouble(locationStrings[3]));
+
+            //After
+            destinationStrings = data.getStringArrayExtra("Result");
+            LatLng latLng = new LatLng(Double.parseDouble(destinationStrings[2]),
+                    Double.parseDouble(destinationStrings[3]));
+
+
             addMarkerPoint(latLng);
 
 
         }
 
 
-    }
+    }   // onActivityResult
 
     private void receiveAndSetup() {
 
@@ -280,6 +299,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
     }
 
+    // For Confirm ==> Upload Value To Server, Cancel ==> Clear Point
     private void myAlertConfirm(String strMessage) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(DirectionActivity.this);
@@ -345,6 +365,8 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             public void onMapClick(LatLng latLng) {
 
                 if (aBoolean2) {
+                    //ยังไม่ได้คลิก Add Point
+
                     Log.d("9JuneV3", "You Click Map");
                     destinationLatLng = latLng;
 
@@ -359,9 +381,15 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
                     createDirection(startLatLng, destinationLatLng);
                 } else {
+                    // Click on Add Point aBoolean2 ==> False
+
+                    //Add Destination Point
                     addMarkerPoint(latLng);
 
-                   // myAlertConfirm("Add Point2");
+                    //Create Value to Update locationTABLE on Server
+                    createValueToUpdateServer(latLng);
+
+
 
                 }
 
@@ -370,6 +398,34 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         });
 
     }   // clickOnMap
+
+    //For 1# Find Last Record of locationTABLE , Cre
+    private void createValueToUpdateServer(LatLng latLng) {
+
+        String tab = "21JuneV1";
+        String urlJSON = "http://woodriverservice.com/Android/getLocationDESC.php";
+        String strID = null;
+
+
+        try {
+
+            GetAllData getAllData = new GetAllData(DirectionActivity.this);
+            getAllData.execute(urlJSON);
+            String strJSON = getAllData.get();
+            getAllData.progressDialog.dismiss();
+            JSONArray jsonArray = new JSONArray(strJSON);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+            strID = jsonObject.getString("id");
+            Log.d(tab, "Last id Location ==> " + strID);
+            strID = Integer.toString(Integer.parseInt(strID) + 1);
+            Log.d(tab, "id Location ที่บันทึก ==> " + strID);
+
+        } catch (Exception e) {
+            Log.d(tab, "e createValueToUpdateServer ==> " + e.toString());
+        }
+
+    }   // createValue
+
 
     //Increase Marker and Direction
     private void addMarkerPoint(LatLng latLngDestination) {

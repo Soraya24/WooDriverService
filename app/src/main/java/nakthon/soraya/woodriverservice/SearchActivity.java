@@ -31,6 +31,7 @@ public class SearchActivity extends ListActivity {
     private ArrayList<String> array_sort;
     private int textlength = 0, Index;
     private boolean aBoolean = true;
+    private int anInt; // Location Record Length on Server
 
 
     @Override
@@ -75,6 +76,8 @@ public class SearchActivity extends ListActivity {
             Log.d(tag, "JSON ==> " + strJSON);
 
             JSONArray jsonArray = new JSONArray(strJSON);
+            anInt = jsonArray.length();
+            Log.d("21JuneV1", "จำนวน Record locationTABLE ==> " + anInt);
             listview_names = new String[jsonArray.length()];
 
             for (int i = 0; i < jsonArray.length(); i++) {
