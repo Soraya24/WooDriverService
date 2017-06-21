@@ -98,8 +98,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         }
 
 
-
-
     }
 
     //Check Confirm
@@ -390,7 +388,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                     createValueToUpdateServer(latLng);
 
 
-
                 }
 
 
@@ -404,7 +401,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
         String tab = "21JuneV1";
         String urlJSON = "http://woodriverservice.com/Android/getLocationDESC.php";
-        String strID = null;
+        String strID = null, strName = "Unknow_", strLat = null, strLng = null;
 
 
         try {
@@ -419,6 +416,12 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             Log.d(tab, "Last id Location ==> " + strID);
             strID = Integer.toString(Integer.parseInt(strID) + 1);
             Log.d(tab, "id Location ที่บันทึก ==> " + strID);
+            strName = strName + strID;
+            Log.d(tab, "strName ==> " + strName);
+            strLat = Double.toString(latLng.latitude);
+            strLng = Double.toString(latLng.longitude);
+            Log.d(tab, "Lat ==> " + strLat);
+            Log.d(tab, "Lng ==> " + strLng);
 
         } catch (Exception e) {
             Log.d(tab, "e createValueToUpdateServer ==> " + e.toString());
@@ -439,7 +442,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         //Add Point to ArrayList
         placeStringArrayList.add(destinationStrings[0]);
         Log.d("20JuneV3", "placeStringArrayList ==> " + placeStringArrayList);
-
 
 
     }   // addMarkerPoint
@@ -477,7 +479,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
 
             mMap.addPolyline(polylineOptions);
-
 
 
 //            mMap.addPolyline(DirectionConverter.createPolyline(DirectionActivity.this,
