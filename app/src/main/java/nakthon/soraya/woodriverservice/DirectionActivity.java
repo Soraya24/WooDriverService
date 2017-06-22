@@ -48,7 +48,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     private boolean aBoolean = true;
     private boolean aBoolean2 = true;
     private boolean aBoolean3 = false;
-    private String dateString, timeString;
+    private String dateString, timeString, strID, jobString;
     private PolylineOptions polylineOptions;
     private ArrayList<String> placeStringArrayList;
 
@@ -269,7 +269,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                     Double.parseDouble(destinationStrings[3]));
 
 
-            addMarkerPoint(latLng);
+            addMarkerPoint(latLng, true);
 
 
         }
@@ -382,11 +382,15 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                 } else {
                     // Click on Add Point aBoolean2 ==> False
 
-                    //Add Destination Point
-                    addMarkerPoint(latLng);
-
                     //Create Value to Update locationTABLE on Server
                     createValueToUpdateServer(latLng);
+
+
+                    // False ==> Click Map
+                    //Add Destination Point
+                    addMarkerPoint(latLng, false);
+
+
 
 
                 }
@@ -402,11 +406,12 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
         String tab = "21JuneV1";
         String urlJSON = "http://woodriverservice.com/Android/getLocationDESC.php";
-        String strID = null, strName = "Unknow_", strLat = null, strLng = null;
+        String strName = "Unknow_", strLat = null, strLng = null;
 
 
         try {
 
+            //Get data
             GetAllData getAllData = new GetAllData(DirectionActivity.this);
             getAllData.execute(urlJSON);
             String strJSON = getAllData.get();
@@ -424,6 +429,11 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             Log.d(tab, "Lat ==> " + strLat);
             Log.d(tab, "Lng ==> " + strLng);
 
+            //Update Location
+            AddLocation addLocation = new AddLocation(DirectionActivity.this);
+            addLocation.execute(strName, strLat, strLng);
+            Log.d(tab, "Update " + strName + " ==> " + addLocation.get());
+
         } catch (Exception e) {
             Log.d(tab, "e createValueToUpdateServer ==> " + e.toString());
         }
@@ -432,7 +442,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
 
     //Increase Marker and Direction
-    private void addMarkerPoint(LatLng latLngDestination) {
+    private void addMarkerPoint(LatLng latLngDestination, boolean bolStatus) {
 
         //Add Point
         startLatLng = destinationLatLng; // Assign Destination ==> Start
@@ -441,8 +451,21 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         createDirection(startLatLng, destinationLatLng);
 
         //Add Point to ArrayList
-        placeStringArrayList.add(destinationStrings[0]);
+
+        if (bolStatus) {
+            //from Search View
+            placeStringArrayList.add(destinationStrings[0]);
+        } else {
+            //From Click Map
+            placeStringArrayList.add(strID);
+        }
+
+
         Log.d("20JuneV3", "placeStringArrayList ==> " + placeStringArrayList);
+
+        jobString = placeStringArrayList.toString();
+        Log.d("20JuneV3", "String of ArrayList ==> " + jobString);
+
 
 
     }   // addMarkerPoint
