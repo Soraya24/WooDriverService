@@ -31,10 +31,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Criteria criteria;
     private double userLatADouble = 13.66788036,
             userLngADouble = 100.6222558;  //Fix to Bangna
+    public LocationListener locationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(Location location) {
+
+            userLatADouble = location.getLatitude();
+            userLngADouble = location.getLongitude();
+
+        }
+
+        @Override
+        public void onStatusChanged(String s, int i, Bundle bundle) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String s) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String s) {
+
+        }
+    };
     private double destinateLatADouble, destinateLngADouble;
     private String[] resultStrings;
     private LatLng userLatLng;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +78,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }   // Main Method
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -64,7 +86,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d("8JuneV3", "requestCode ==> " + requestCode);
 
         resultStrings = data.getStringArrayExtra("Result");
-        for (int i=0;i<resultStrings.length;i+=1) {
+        for (int i = 0; i < resultStrings.length; i += 1) {
             Log.d("8JuneV3", "resultString(" + i + ") ==> " + resultStrings[i]);
 
             //Change Center Map & Create Marker
@@ -111,10 +133,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             JSONArray jsonArray = new JSONArray(strJSON);
             int intLength = jsonArray.length();
             Log.d("7JuneV2", "intLength ==> " + intLength);
-
-
-
-
 
 
         } catch (Exception e) {
@@ -178,31 +196,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         return location;
     }
-
-    public LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-
-            userLatADouble = location.getLatitude();
-            userLngADouble = location.getLongitude();
-
-        }
-
-        @Override
-        public void onStatusChanged(String s, int i, Bundle bundle) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String s) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String s) {
-
-        }
-    };
 
     private void setupObject() {
         locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);

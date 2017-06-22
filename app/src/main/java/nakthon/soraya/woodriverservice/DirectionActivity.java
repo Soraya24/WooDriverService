@@ -30,6 +30,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -45,8 +48,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     private boolean aBoolean = true;
     private boolean aBoolean2 = true;
     private boolean aBoolean3 = false;
-    private String dateString, timeString;
+    private String dateString, timeString, strID, jobString;
     private PolylineOptions polylineOptions;
+    private ArrayList<String> placeStringArrayList;
 
 
     @Override
@@ -79,6 +83,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }   // Main Method
 
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -93,10 +98,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         }
 
 
-
-
     }
 
+    //Check Confirm
     private void confirmController() {
         ImageView imageView = (ImageView) findViewById(R.id.imvConfirm);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -105,8 +109,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                 myAlertConfirm("Add Point");
             }
         });
-    }
+    }   // confirmController
 
+    //Click ImageView for Change Mode to Add Point or Marker
     private void addPointController() {
         final ImageView imageView = (ImageView) findViewById(R.id.imvAddPoint);
         final String tag = "19JuneV1";
@@ -120,6 +125,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
                 //Change Image When Click
                 imageView.setImageResource(R.mipmap.ic_unadd);
+
+                //Add Array List การเพิ่ม array index0
+                placeStringArrayList.add(destinationStrings[0]);
 
 
             }   // onClick
@@ -139,7 +147,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             }
         });
 
-    }
+    }   //dateController
 
     private void setupDateAndTime() {
 
@@ -199,6 +207,8 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }
 
+    //Listener of Back #1.ย้งไม่ได้ Add Point จะ Finish
+    // #2. ถ้า Add Point แล้ว ไปทำงานที่ backForAddPoint()
     private void backController() {
 
         //Initial View
@@ -228,8 +238,10 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         });
     }   // backController
 
+    //Method Active After You Click Add Point
     private void backForAddPoint() {
 
+        //Intent for Result to Search Wait Array Result
         Intent intent = new Intent(DirectionActivity.this, SearchActivity.class);
         intent.putExtra("Status", aBoolean2);
         startActivityForResult(intent, 1200);
@@ -244,24 +256,39 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         if (requestCode == 1200) {
 
             Log.d(tag, "สิ่งที่ทำงาน หลัง SearchView ที่ AddPoinet");
-            String[] locationStrings = data.getStringArrayExtra("Result");
-            LatLng latLng = new LatLng(Double.parseDouble(locationStrings[2]),
-                    Double.parseDouble(locationStrings[3]));
-            addMarkerPoint(latLng);
+
+            //before
+//            String[] locationStrings = data.getStringArrayExtra("Result");
+//            LatLng latLng = new LatLng(Double.parseDouble(locationStrings[2]),
+//                    Double.parseDouble(locationStrings[3]));
+
+            //After
+            destinationStrings = data.getStringArrayExtra("Result");
+            LatLng latLng = new LatLng(Double.parseDouble(destinationStrings[2]),
+                    Double.parseDouble(destinationStrings[3]));
+
+
+            addMarkerPoint(latLng, true);
 
 
         }
 
 
-    }
+    }   // onActivityResult
 
     private void receiveAndSetup() {
+
         destinationStrings = getIntent().getStringArrayExtra("Result");
         startLatADouble = getIntent().getDoubleExtra("Lat", 0);
         startLngADouble = getIntent().getDoubleExtra("Lng", 0);
         startLatLng = new LatLng(startLatADouble, startLngADouble);
         destinationLatLng = new LatLng(Double.parseDouble(destinationStrings[2]),
                 Double.parseDouble(destinationStrings[3]));
+
+        Log.d("20JuneV3", "id of LocationTABLE ==> " + destinationStrings[0]);
+
+        placeStringArrayList = new ArrayList<>();
+
     }
 
     private void mapFragment() {
@@ -270,6 +297,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         mapFragment.getMapAsync(this);
     }
 
+    // For Confirm ==> Upload Value To Server, Cancel ==> Clear Point
     private void myAlertConfirm(String strMessage) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(DirectionActivity.this);
@@ -335,6 +363,8 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
             public void onMapClick(LatLng latLng) {
 
                 if (aBoolean2) {
+                    //ยังไม่ได้คลิก Add Point
+
                     Log.d("9JuneV3", "You Click Map");
                     destinationLatLng = latLng;
 
@@ -349,9 +379,16 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
                     createDirection(startLatLng, destinationLatLng);
                 } else {
-                    addMarkerPoint(latLng);
+                    // Click on Add Point aBoolean2 ==> False
 
-                   // myAlertConfirm("Add Point2");
+                    //Create Value to Update locationTABLE on Server
+                    createValueToUpdateServer(latLng);
+
+
+                    // False ==> Click Map
+                    //Add Destination Point
+                    addMarkerPoint(latLng, false);
+
 
                 }
 
@@ -361,12 +398,73 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
     }   // clickOnMap
 
-    private void addMarkerPoint(LatLng latLngDestination) {
+    //For 1# Find Last Record of locationTABLE , Cre
+    private void createValueToUpdateServer(LatLng latLng) {
+
+        String tab = "21JuneV1";
+        String urlJSON = "http://woodriverservice.com/Android/getLocationDESC.php";
+        String strName = "Unknow_", strLat = null, strLng = null;
+
+
+        try {
+
+            //Get data
+            GetAllData getAllData = new GetAllData(DirectionActivity.this);
+            getAllData.execute(urlJSON);
+            String strJSON = getAllData.get();
+            getAllData.progressDialog.dismiss();
+            JSONArray jsonArray = new JSONArray(strJSON);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+            strID = jsonObject.getString("id");
+            Log.d(tab, "Last id Location ==> " + strID);
+            strID = Integer.toString(Integer.parseInt(strID) + 1);
+            Log.d(tab, "id Location ที่บันทึก ==> " + strID);
+            strName = strName + strID;
+            Log.d(tab, "strName ==> " + strName);
+            strLat = Double.toString(latLng.latitude);
+            strLng = Double.toString(latLng.longitude);
+            Log.d(tab, "Lat ==> " + strLat);
+            Log.d(tab, "Lng ==> " + strLng);
+
+            //Update Location
+            AddLocation addLocation = new AddLocation(DirectionActivity.this);
+            addLocation.execute(strName, strLat, strLng);
+            Log.d(tab, "Update " + strName + " ==> " + addLocation.get());
+
+        } catch (Exception e) {
+            Log.d(tab, "e createValueToUpdateServer ==> " + e.toString());
+        }
+
+    }   // createValue
+
+
+    //Increase Marker and Direction
+    private void addMarkerPoint(LatLng latLngDestination, boolean bolStatus) {
+
+        //Add Point
         startLatLng = destinationLatLng; // Assign Destination ==> Start
         destinationLatLng = latLngDestination;      // Assign latLnt ==> Destination
         createMarker(destinationLatLng, iconInts[1]);
         createDirection(startLatLng, destinationLatLng);
-    }
+
+        //Add Point to ArrayList
+
+        if (bolStatus) {
+            //from Search View
+            placeStringArrayList.add(destinationStrings[0]);
+        } else {
+            //From Click Map
+            placeStringArrayList.add(strID);
+        }
+
+
+        Log.d("20JuneV3", "placeStringArrayList ==> " + placeStringArrayList);
+
+        jobString = placeStringArrayList.toString();
+        Log.d("20JuneV3", "String of ArrayList ==> " + jobString);
+
+
+    }   // addMarkerPoint
 
     private void createDirection(LatLng startLatLng, LatLng destinationLatLng) {
 
@@ -401,7 +499,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
 
             mMap.addPolyline(polylineOptions);
-
 
 
 //            mMap.addPolyline(DirectionConverter.createPolyline(DirectionActivity.this,

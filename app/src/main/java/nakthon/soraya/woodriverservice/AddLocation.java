@@ -11,14 +11,15 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 
 /**
- * Created by masterUNG on 4/18/2017 AD.
+ * Created by masterUNG on 6/21/2017 AD.
  */
 
-public class GetDataWhere extends AsyncTask<String, Void, String> {
+public class AddLocation extends AsyncTask<String, Void, String> {
 
+    private static final String urlPHP = "http://woodriverservice.com/Android/addLocation.php";
     private Context context;
 
-    public GetDataWhere(Context context) {
+    public AddLocation(Context context) {
         this.context = context;
     }
 
@@ -30,18 +31,20 @@ public class GetDataWhere extends AsyncTask<String, Void, String> {
             OkHttpClient okHttpClient = new OkHttpClient();
             RequestBody requestBody = new FormEncodingBuilder()
                     .add("isAdd", "true")
-                    .add(strings[0], strings[1])
+                    .add("Name", strings[0])
+                    .add("Lat", strings[1])
+                    .add("Lng", strings[2])
                     .build();
             Request.Builder builder = new Request.Builder();
-            Request request = builder.url(strings[2]).post(requestBody).build();
+            Request request = builder.url(urlPHP).post(requestBody).build();
             Response response = okHttpClient.newCall(request).execute();
             return response.body().string();
 
         } catch (Exception e) {
-            Log.d("18AprilV2", "e doIn ==> " + e.toString());
+            Log.d("21JuneV1", "e doIn ==> " + e.toString());
             return null;
         }
 
 
     }
-}   // Main Class
+}   // Class
