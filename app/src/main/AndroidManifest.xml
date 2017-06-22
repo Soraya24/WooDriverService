@@ -43,7 +43,8 @@
         <activity android:name=".SearchActivity" />
         <activity
             android:name=".DirectionActivity"
-            android:label="@string/title_activity_direction"></activity>
+            android:label="@string/title_activity_direction" />
+        <activity android:name=".NewRegisterActivity"></activity>
     </application>
 
 </manifest>
