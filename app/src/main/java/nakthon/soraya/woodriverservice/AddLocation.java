@@ -14,10 +14,10 @@ import com.squareup.okhttp.Response;
  * Created by masterUNG on 6/21/2017 AD.
  */
 
-public class AddLocation extends AsyncTask<String, Void, String>{
+public class AddLocation extends AsyncTask<String, Void, String> {
 
-    private Context context;
     private static final String urlPHP = "http://woodriverservice.com/Android/addLocation.php";
+    private Context context;
 
     public AddLocation(Context context) {
         this.context = context;

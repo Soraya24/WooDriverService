@@ -81,7 +81,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         confirmController();
 
 
-
     }   // Main Method
 
 
@@ -391,8 +390,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
                     addMarkerPoint(latLng, false);
 
 
-
-
                 }
 
 
@@ -465,7 +462,6 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
         jobString = placeStringArrayList.toString();
         Log.d("20JuneV3", "String of ArrayList ==> " + jobString);
-
 
 
     }   // addMarkerPoint

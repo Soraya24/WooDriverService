@@ -14,7 +14,7 @@ import com.squareup.okhttp.Response;
  * Created by masterUNG on 4/18/2017 AD.
  */
 
-public class GetDataWhere extends AsyncTask<String, Void, String>{
+public class GetDataWhere extends AsyncTask<String, Void, String> {
 
     private Context context;
 

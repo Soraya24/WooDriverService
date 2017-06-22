@@ -13,10 +13,10 @@ import com.squareup.okhttp.Response;
  * Created by masterUNG on 6/7/2017 AD.
  */
 
-public class GetAllData extends AsyncTask<String, Integer, String>{
+public class GetAllData extends AsyncTask<String, Integer, String> {
 
-    private Context context;
     public ProgressDialog progressDialog;
+    private Context context;
 
     public GetAllData(Context context) {
         this.context = context;
