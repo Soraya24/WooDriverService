@@ -3,6 +3,8 @@ package nakthon.soraya.woodriverservice;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -50,6 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
 
+
         @Override
         public void onProviderDisabled(String s) {
 
@@ -58,14 +63,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double destinateLatADouble, destinateLngADouble;
     private String[] resultStrings;
     private LatLng userLatLng;
+    private MyManage myManage;
+    private String idPassengerString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        //Check SQLite
+        checkSQLite();
+
+
         //Synchronize Location
-        synchronizeLocation();
+        //synchronizeLocation();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         myMapFragment();
@@ -77,6 +88,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         searchController();
 
     }   // Main Method
+
+    private void checkSQLite(){
+
+        //Instant Object MyManage
+        myManage = new MyManage(MapsActivity.this);
+
+        //Create Cursor by Select All
+        SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
+                MODE_PRIVATE, null);
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM passengerTABLE", null);
+        cursor.moveToFirst();
+        Log.d("22JuneV1", "cursor.getCount ==> " + cursor.getCount() );
+
+        //Check Cursor.count
+        if (cursor.getCount() == 0) {
+
+            //No Data
+            Log.d("22JuneV1", "No Data");
+
+            Toast.makeText(MapsActivity.this, "Please Register", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MapsActivity.this, NewRegisterActivity.class));
+
+        } else {
+
+            //Have Data
+            String passengerString = cursor.getString(1);
+            String urlPHP = "http://woodriverservice.com/Android/getPassengerWhereName.php";
+            Log.d("22JuneV1", "passengerString ==> " + passengerString);
+
+            //Get ID
+            try {
+
+                GetValueWhere getValueWhere = new GetValueWhere(MapsActivity.this);
+                getValueWhere.execute("Name", passengerString, urlPHP);
+                String strJSON = getValueWhere.get();
+
+                JSONArray jsonArray = new JSONArray(strJSON);
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                idPassengerString = jsonObject.getString("id");
+
+                Log.d("22JuneV1", "id of Passenger ==> " + idPassengerString);
+
+            } catch (Exception e) {
+                Log.d("22JuneV1", "e Check ==> " + e.toString());
+            }
+
+
+        }
+
+
+        cursor.close();
+
+    }   // checkSQLite
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -144,6 +208,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
+
+        checkSQLite();
+
 
         //For Network
         Location networkLocation = myFindLocation(LocationManager.NETWORK_PROVIDER);

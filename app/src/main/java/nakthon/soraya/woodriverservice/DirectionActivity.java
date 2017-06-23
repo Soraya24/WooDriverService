@@ -5,6 +5,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -14,6 +16,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.akexorcist.googledirection.DirectionCallback;
 import com.akexorcist.googledirection.GoogleDirection;
@@ -48,7 +51,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     private boolean aBoolean = true;
     private boolean aBoolean2 = true;
     private boolean aBoolean3 = false;
-    private String dateString, timeString, strID, jobString;
+    private String dateString, timeString, strID, jobString, idPassengerString, passengerString;
     private PolylineOptions polylineOptions;
     private ArrayList<String> placeStringArrayList;
 
@@ -61,6 +64,9 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
         //Receive Value & Setup
         receiveAndSetup();
+
+        //Find id Passenger
+        findIDpassenger();
 
         //Map Fragment
         mapFragment();
@@ -82,6 +88,41 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
 
 
     }   // Main Method
+
+    private void findIDpassenger() {
+
+        String urlPHP = "http://woodriverservice.com/Android/getPassengerWhereName.php";
+
+        //Get ID
+        try {
+
+            //Instant Object MyManage
+            MyManage myManage = new MyManage(DirectionActivity.this);
+
+            //Create Cursor by Select All
+            SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.database_name,
+                    MODE_PRIVATE, null);
+            Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM passengerTABLE", null);
+            cursor.moveToFirst();
+
+            passengerString = cursor.getString(1);
+
+            GetValueWhere getValueWhere = new GetValueWhere(DirectionActivity.this);
+            getValueWhere.execute("Name", passengerString, urlPHP);
+            String strJSON = getValueWhere.get();
+
+            JSONArray jsonArray = new JSONArray(strJSON);
+            JSONObject jsonObject = jsonArray.getJSONObject(0);
+            idPassengerString = jsonObject.getString("id");
+
+            Log.d("22JuneV1", "id of Passenger ==> " + idPassengerString);
+
+            cursor.close();
+        } catch (Exception e) {
+            Log.d("22JuneV1", "e Check ==> " + e.toString());
+        }
+
+    }
 
 
     @Override
@@ -300,10 +341,22 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     // For Confirm ==> Upload Value To Server, Cancel ==> Clear Point
     private void myAlertConfirm(String strMessage) {
 
+        final String strTimes = dateString + " " + timeString;
+        String tag = "23JuneV1";
+
         AlertDialog.Builder builder = new AlertDialog.Builder(DirectionActivity.this);
         builder.setCancelable(false);
         builder.setTitle("Please Confirm");
-        builder.setMessage(strMessage);
+        builder.setMessage("Passenger ==> " + passengerString + "\n" + "Time Work ==> " + strTimes);
+
+        //Show Log
+        Log.d(tag, "idPassenger ==> " + idPassengerString);
+        Log.d(tag, "Times ==> " + strTimes);
+        Log.d(tag, "LatStart ==> " + startLatADouble);
+        Log.d(tag, "LngStart ==> " + startLngADouble);
+        Log.d(tag, "Job ==> " + placeStringArrayList.toString());
+
+
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -328,10 +381,46 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                upLoadValueToServer(idPassengerString, strTimes, startLatADouble,
+                        startLngADouble, placeStringArrayList.toString());
                 dialogInterface.dismiss();
             }
         });
         builder.show();
+
+    }
+
+    private void upLoadValueToServer(String idPassengerString,
+                                     String strTimes,
+                                     double startLatADouble,
+                                     double startLngADouble,
+                                     String jobArrayListString) {
+        String tag = "23JuneV1";
+
+        try {
+
+            AddPureJob addPureJob = new AddPureJob(DirectionActivity.this);
+            addPureJob.execute(idPassengerString, strTimes,
+                    Double.toString(startLatADouble), Double.toString(startLngADouble),
+                    jobArrayListString);
+
+            if (Boolean.parseBoolean(addPureJob.get())) {
+                Toast.makeText(DirectionActivity.this, "Save Value to Server Success",
+                        Toast.LENGTH_SHORT).show();
+
+                //Intent to WaitActivity
+                Intent intent = new Intent(DirectionActivity.this, WaitActivity.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+                Toast.makeText(DirectionActivity.this, "Cannot Save Value To Server",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            Log.d(tag, "e upLoad ==> " + e.toString());
+        }
 
     }
 

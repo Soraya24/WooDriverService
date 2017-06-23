@@ -34,6 +34,7 @@ public class SearchActivity extends ListActivity {
     private int anInt; // Location Record Length on Server
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
