@@ -16,6 +16,7 @@ import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.akexorcist.googledirection.DirectionCallback;
 import com.akexorcist.googledirection.GoogleDirection;
@@ -340,7 +341,7 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
     // For Confirm ==> Upload Value To Server, Cancel ==> Clear Point
     private void myAlertConfirm(String strMessage) {
 
-        String strTimes = dateString + " " + timeString;
+        final String strTimes = dateString + " " + timeString;
         String tag = "23JuneV1";
 
         AlertDialog.Builder builder = new AlertDialog.Builder(DirectionActivity.this);
@@ -380,10 +381,46 @@ public class DirectionActivity extends FragmentActivity implements OnMapReadyCal
         builder.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+                upLoadValueToServer(idPassengerString, strTimes, startLatADouble,
+                        startLngADouble, placeStringArrayList.toString());
                 dialogInterface.dismiss();
             }
         });
         builder.show();
+
+    }
+
+    private void upLoadValueToServer(String idPassengerString,
+                                     String strTimes,
+                                     double startLatADouble,
+                                     double startLngADouble,
+                                     String jobArrayListString) {
+        String tag = "23JuneV1";
+
+        try {
+
+            AddPureJob addPureJob = new AddPureJob(DirectionActivity.this);
+            addPureJob.execute(idPassengerString, strTimes,
+                    Double.toString(startLatADouble), Double.toString(startLngADouble),
+                    jobArrayListString);
+
+            if (Boolean.parseBoolean(addPureJob.get())) {
+                Toast.makeText(DirectionActivity.this, "Save Value to Server Success",
+                        Toast.LENGTH_SHORT).show();
+
+                //Intent to WaitActivity
+                Intent intent = new Intent(DirectionActivity.this, WaitActivity.class);
+                startActivity(intent);
+                finish();
+
+            } else {
+                Toast.makeText(DirectionActivity.this, "Cannot Save Value To Server",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            Log.d(tag, "e upLoad ==> " + e.toString());
+        }
 
     }
 

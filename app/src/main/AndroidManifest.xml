@@ -44,7 +44,8 @@
         <activity
             android:name=".DirectionActivity"
             android:label="@string/title_activity_direction" />
-        <activity android:name=".NewRegisterActivity"></activity>
+        <activity android:name=".NewRegisterActivity" />
+        <activity android:name=".WaitActivity"></activity>
     </application>
 
 </manifest>
